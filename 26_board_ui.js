@@ -450,9 +450,9 @@ function render() {
 }
 
 
-document.getElementById('confirmReportYes').onclick = () => {
+document.getElementById('confirmReportYes').onclick = async () => {
   reportConfirm.style.display = 'none';
-  confirmReport();
+  await confirmReport();
   pendingReport = null;
   render();
 };

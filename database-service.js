@@ -82,7 +82,19 @@ class DatabaseService {
         return
       }
       
-      this.posts = data || []
+      // Convert database format to local format
+      this.posts = (data || []).map(post => ({
+        id: post.id,
+        board: post.board,
+        content: post.content,
+        image: post.image,
+        votes: post.votes,
+        reports: post.reports,
+        createdAt: new Date(post.created_at).getTime(), // Convert to timestamp
+        tags: post.tags || [],
+        userIp: post.user_ip
+      }))
+      
       console.log(`Loaded ${this.posts.length} posts from database`)
     } catch (error) {
       console.error('Error loading posts:', error)
@@ -109,14 +121,27 @@ class DatabaseService {
 
   // Handle database changes
   handleDatabaseChange(payload) {
+    // Convert database format to local format
+    const convertPost = (post) => ({
+      id: post.id,
+      board: post.board,
+      content: post.content,
+      image: post.image,
+      votes: post.votes,
+      reports: post.reports,
+      createdAt: new Date(post.created_at).getTime(),
+      tags: post.tags || [],
+      userIp: post.user_ip
+    })
+
     switch (payload.eventType) {
       case 'INSERT':
-        this.posts.unshift(payload.new)
+        this.posts.unshift(convertPost(payload.new))
         break
       case 'UPDATE':
         const updateIndex = this.posts.findIndex(p => p.id === payload.new.id)
         if (updateIndex !== -1) {
-          this.posts[updateIndex] = payload.new
+          this.posts[updateIndex] = convertPost(payload.new)
         }
         break
       case 'DELETE':
@@ -152,7 +177,19 @@ class DatabaseService {
       }
       
       console.log('Post added successfully:', data[0])
-      return data[0]
+      
+      // Convert to local format
+      return {
+        id: data[0].id,
+        board: data[0].board,
+        content: data[0].content,
+        image: data[0].image,
+        votes: data[0].votes,
+        reports: data[0].reports,
+        createdAt: new Date(data[0].created_at).getTime(),
+        tags: data[0].tags || [],
+        userIp: data[0].user_ip
+      }
     } catch (error) {
       console.error('Error adding post:', error)
       return null
@@ -174,7 +211,19 @@ class DatabaseService {
       }
       
       console.log('Post updated successfully:', data[0])
-      return data[0]
+      
+      // Convert to local format
+      return {
+        id: data[0].id,
+        board: data[0].board,
+        content: data[0].content,
+        image: data[0].image,
+        votes: data[0].votes,
+        reports: data[0].reports,
+        createdAt: new Date(data[0].created_at).getTime(),
+        tags: data[0].tags || [],
+        userIp: data[0].user_ip
+      }
     } catch (error) {
       console.error('Error updating post:', error)
       return null
